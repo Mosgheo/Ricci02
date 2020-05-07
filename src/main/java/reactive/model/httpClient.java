@@ -1,4 +1,4 @@
-package reactive;
+package model;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -14,6 +14,8 @@ import java.util.List;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+
+import control.SharedContext;
 
 
 public class httpClient {

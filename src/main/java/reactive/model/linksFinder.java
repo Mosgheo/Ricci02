@@ -1,4 +1,4 @@
-package reactive;
+package model;
 
 import java.awt.Color;
 import java.net.MalformedURLException;
@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
+import control.SharedContext;
 import io.reactivex.rxjava3.core.*;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 
@@ -62,7 +63,7 @@ public class linksFinder {
 			context.addEdge(node.getFather() + node.getTitle(),node.getFather(),node.getTitle());			
 			createAndSubscribe(node);		
 			
-		} else {			
+		} else {		
 			//if the edge between the two exists this instruction will be ignored
 			context.addEdge(node.getFather() + node.getTitle(),node.getFather(),node.getTitle());
 			
@@ -127,10 +128,9 @@ public class linksFinder {
 			httpClient client = new httpClient(converted, context);
 			
 			Observable
-			.interval(10, TimeUnit.SECONDS)
+			.interval(6, TimeUnit.SECONDS)
 			.subscribeOn(Schedulers.io())
 			.subscribe((s) -> {
-			
 				if(client.connect() && client.getResult() != null) {
 					
 					List <String> titles = client.getResult();
@@ -138,7 +138,11 @@ public class linksFinder {
 					for (String title : titles) {	
 						if(!context.nodeExists(title)) {	
 							log("FOUND UPDATE FROM: "+node.getTitle()+ " --- " + title);
-							handleNode(new Voice(node.getDepth()+1, title, node.getTitle(), node.getColor()));
+							handleNode(new Voice(node.getDepth() + 1, title, node.getTitle(), node.getColor()));
+						}
+						else if (!context.edgeExistsTo(node.getTitle(), title)) {
+							log("REMOVING NODE FROM: " + node.getTitle() + " --- " + title);
+							context.removeEdgeAndClean(title, node.getTitle());						
 						}
 					}												
 				}

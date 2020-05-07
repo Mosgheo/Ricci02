@@ -1,4 +1,4 @@
-package reactive;
+package model;
 
 public class Voice {
 	final private int depth;

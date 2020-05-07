@@ -1,10 +1,15 @@
-package reactive;
+package control;
 
+import java.util.Collection;
+import java.util.Set;
+
+import org.graphstream.graph.Edge;
 import org.graphstream.graph.Graph;
 
 import org.graphstream.graph.Node;
 import org.graphstream.graph.implementations.SingleGraph;
 
+import model.linksFinder;
 import io.reactivex.rxjava3.subjects.PublishSubject;
 
 public final class SharedContext {
@@ -30,9 +35,9 @@ public final class SharedContext {
 		}
 	}
 	
-	public boolean edgeExists (String title) {
+	public boolean edgeExistsTo (String node1, String node2) {
 		synchronized(graph) {
-			return graph.getEdge(title) != null;
+			return graph.getNode(node1).hasEdgeToward(node2);
 		}
 	}
 
@@ -50,6 +55,7 @@ public final class SharedContext {
 			graph.addEdge(title, elem1, elem2);
 		}
 	}	
+
 	
 	public Graph getGraph() {
 		return graph;
@@ -64,9 +70,6 @@ public final class SharedContext {
 		return SharedContext.SINGLETON;
 	}
 	
-	private static void log(String msg) {
-		System.out.println("[ " + Thread.currentThread().getName() + "  ] " + msg);
-	}
 
 	public void setBasicUrl() {
 		SharedContext.BASICURL = this.initialUrl.toString().substring(0, 25);
@@ -83,5 +86,28 @@ public final class SharedContext {
 	public void setInitialUrl(final String url) {
 		this.initialUrl = url;
 		setBasicUrl();
+	}
+
+	//if i get an update and need to delete a node i also check all the children
+	public void removeEdgeAndClean(String node, String father) {
+		synchronized(graph) {
+			graph.removeEdge(father, node);
+			
+			Node toRemove = graph.getNode(node);
+			Collection<Edge> fathers = toRemove.getEnteringEdgeSet();
+			
+			if(fathers.isEmpty()) {
+				for(Edge edge : toRemove.getLeavingEdgeSet()) {
+					removeEdgeAndClean(edge.getTargetNode().getId(), node);
+				}
+				graph.removeNode(node);
+				stream.onNext(graph.getNodeCount());
+			}
+		}
+	}
+
+	
+	private static void log(String msg) {
+		System.out.println("[ " + Thread.currentThread().getName() + "  ] " + msg);
 	}
 }
