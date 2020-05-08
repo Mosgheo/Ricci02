@@ -1,4 +1,4 @@
-package View;
+package reactive.View;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -24,7 +24,7 @@ import org.graphstream.ui.view.Camera;
 import org.graphstream.ui.view.View;
 import org.graphstream.ui.view.Viewer;
 
-import control.SharedContext;
+import reactive.control.SharedContext;
 
 public class Gui extends JFrame {
 

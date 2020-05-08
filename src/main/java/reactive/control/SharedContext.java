@@ -1,4 +1,4 @@
-package control;
+package reactive.control;
 
 import java.util.Collection;
 import java.util.Set;
@@ -9,8 +9,9 @@ import org.graphstream.graph.Graph;
 import org.graphstream.graph.Node;
 import org.graphstream.graph.implementations.SingleGraph;
 
-import model.linksFinder;
+
 import io.reactivex.rxjava3.subjects.PublishSubject;
+import reactive.model.linksFinder;
 
 public final class SharedContext {
 

@@ -1,4 +1,4 @@
-package model;
+package reactive.model;
 
 import java.awt.Color;
 import java.net.MalformedURLException;
@@ -7,9 +7,9 @@ import java.util.List;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
-import control.SharedContext;
 import io.reactivex.rxjava3.core.*;
 import io.reactivex.rxjava3.schedulers.Schedulers;
+import reactive.control.SharedContext;
 
 public class linksFinder {
 

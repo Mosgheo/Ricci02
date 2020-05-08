@@ -1,7 +1,7 @@
-package common;
+package reactive.common;
 
-import View.Gui;
-import control.SharedContext;
+import reactive.View.Gui;
+import reactive.control.SharedContext;
 
 public class main {
 	
