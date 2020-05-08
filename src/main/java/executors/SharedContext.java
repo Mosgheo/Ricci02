@@ -32,11 +32,15 @@ public final class SharedContext {
 	}
 	
 	public boolean nodeExists (String title) {
-		return graph.getNode(title) != null;
+		synchronized(graph) {
+			return graph.getNode(title) != null;
+		}
 	}
 	
-	public boolean edgeExists (String title) {
-		return graph.getEdge(title) != null;
+	public boolean edgeExistsTo (String node1, String node2) {
+		synchronized(graph) {
+			return graph.getNode(node1).hasEdgeToward(node2);
+		}
 	}
 	
 	public void addNode (String title) {
