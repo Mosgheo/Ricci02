@@ -31,22 +31,21 @@ public final class SharedContext {
 		graph = new SingleGraph("grafo");
 	}
 	
-	public boolean nodeExists (String title) {
+	public boolean nodeExists(String title) {
 		synchronized(graph) {
 			return graph.getNode(title) != null;
 		}
 	}
 	
-	public boolean edgeExistsTo (String node1, String node2) {
+	public boolean edgeExistsTo(String node1, String node2) {
 		synchronized(graph) {
 			return graph.getNode(node1).hasEdgeToward(node2);
 		}
 	}
 	
-	public void addNode (String title) {
+	public void addNode(String title) {
 		synchronized (graph) {
 			try {
-				//System.out.println(title);
 				graph.addNode(title);
 				graph.getNode(title).addAttribute("ui.label", graph.getNode(title).getId());
 				setLabelText(++nNodes);
@@ -54,7 +53,7 @@ public final class SharedContext {
 		}
 	}
 	
-	public void addEdge (String title, String elem1, String elem2) {
+	public void addEdge(String title, String elem1, String elem2) {
 		synchronized (graph) {
 			try {
 				graph.addEdge(title, elem1, elem2);
