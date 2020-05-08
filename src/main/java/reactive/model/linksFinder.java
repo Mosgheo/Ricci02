@@ -3,9 +3,12 @@ package reactive.model;
 import java.awt.Color;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
+
+import org.graphstream.graph.Edge;
 
 import io.reactivex.rxjava3.core.*;
 import io.reactivex.rxjava3.schedulers.Schedulers;
@@ -16,7 +19,7 @@ public class linksFinder {
 	private final SharedContext context;
 	private final String base;
 	private final int depth;
-	
+	int TODOREMOVE = 0;
 	public linksFinder(final SharedContext context, String base, int depth) {
 		this.context = context;
 		this.base = base;
@@ -40,7 +43,7 @@ public class linksFinder {
 					for (String title : titles) {
 						emitter.onNext(new Voice(1, title, baseTitle, generateColor()));
 					}
-					checkNodeForUpdates(new Voice(0,baseTitle,null,"rgb(0,0,0);"));
+//					checkNodeForUpdates(new Voice(0,baseTitle,null,"rgb(0,0,0);"));
 				}
 			}	
 		 });
@@ -55,22 +58,21 @@ public class linksFinder {
 		}, Throwable::printStackTrace);
 	}
 
-	private void handleNode(Voice node) {
+	private synchronized void handleNode(Voice node) {
 		//if the node exists add node and edge else add only edge
 		if(!context.nodeExists(node.getTitle())) {	
 
 			context.addNode(node.getTitle(), node.getColor());
 			context.addEdge(node.getFather() + node.getTitle(),node.getFather(),node.getTitle());			
-			createAndSubscribe(node);		
 			
-		} else {		
+		} else if(!context.edgeExistsTo(node.getFather(), node.getTitle())) {	
 			//if the edge between the two exists this instruction will be ignored
-			context.addEdge(node.getFather() + node.getTitle(),node.getFather(),node.getTitle());
-			
-			createAndSubscribe(node);						
+			context.addEdge(node.getFather() + node.getTitle(),node.getFather(),node.getTitle());										
 		}
 		
-		//Check for updates on the nodes
+		//we keep going in deep anyway since the depth may differ
+		createAndSubscribe(node);	
+		//Check for updates on the node
 		checkNodeForUpdates(node);
 	}	
 	
@@ -129,10 +131,11 @@ public class linksFinder {
 			
 			Observable
 			.interval(6, TimeUnit.SECONDS)
-			.subscribeOn(Schedulers.io())
+			.subscribeOn(Schedulers.computation())
 			.subscribe((s) -> {
 				if(client.connect() && client.getResult() != null) {
-					
+
+					ArrayList<String> children = context.getChildren(node.getTitle());
 					List <String> titles = client.getResult();
 					
 					for (String title : titles) {	
@@ -140,11 +143,15 @@ public class linksFinder {
 							log("FOUND UPDATE FROM: "+node.getTitle()+ " --- " + title);
 							handleNode(new Voice(node.getDepth() + 1, title, node.getTitle(), node.getColor()));
 						}
-						else if (!context.edgeExistsTo(node.getTitle(), title)) {
-							log("REMOVING NODE FROM: " + node.getTitle() + " --- " + title);
-							context.removeEdgeAndClean(title, node.getTitle());						
+					}
+					
+					for (String child : children) {
+						if(!titles.contains(child)) {
+							log("REMOVING NODE FROM: " + node.getTitle() + " --- " + child);
+							context.removeEdgeAndClean(child, node.getTitle());	
+							children.remove(child);
 						}
-					}												
+					}			
 				}
 			});
 		}

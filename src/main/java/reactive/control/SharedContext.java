@@ -1,6 +1,9 @@
 package reactive.control;
 
+import java.awt.List;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Set;
 
 import org.graphstream.graph.Edge;
@@ -20,10 +23,11 @@ public final class SharedContext {
 	private Graph graph;
 	private static String BASICURL;
 	private String initialUrl;
+
 	
 	public SharedContext() {
 		graph = new SingleGraph("grafo");
-		graph.setStrict(false);
+//		graph.setStrict(false);
 	}
 	
 	public void Start(String base, Integer depth) {
@@ -88,21 +92,47 @@ public final class SharedContext {
 		this.initialUrl = url;
 		setBasicUrl();
 	}
+	
+	public ArrayList<String> getChildren(String node) {
+		synchronized(graph) {
+			ArrayList<String> children = new ArrayList<String>();
+			
+			for(Edge edge : graph.getNode(node).getEachEdge()) {
+				if(edge != null && edge.getSourceNode().getId().equals(node)) {
+					children.add(edge.getTargetNode().getId());
+				}
+			}
+			
+			return children;
+		}
+	}
 
 	//if i get an update and need to delete a node i also check all the children
 	public void removeEdgeAndClean(String node, String father) {
 		synchronized(graph) {
-			graph.removeEdge(father, node);
-			
-			Node toRemove = graph.getNode(node);
-			Collection<Edge> fathers = toRemove.getEnteringEdgeSet();
-			
-			if(fathers.isEmpty()) {
-				for(Edge edge : toRemove.getLeavingEdgeSet()) {
-					removeEdgeAndClean(edge.getTargetNode().getId(), node);
+			if(!father.equals(node) && nodeExists(node) && nodeExists(father)) {
+				graph.removeEdge(father, node);				
+	
+				Node toRemove = graph.getNode(node);
+				Collection<Edge> edges =  new HashSet<Edge> (toRemove.getEdgeSet());
+				
+				Collection<Edge> fathers = new HashSet<Edge>();
+				for(Edge edge : edges) {
+					if(edge != null && edge.getTargetNode().equals(toRemove)) {
+						fathers.add(edge);
+					}
 				}
-				graph.removeNode(node);
-				stream.onNext(graph.getNodeCount());
+				
+				
+				if(fathers.isEmpty()) {				
+					for(Edge edge : edges) {
+						if(edge != null && edge.getSourceNode().equals(toRemove)) {
+							removeEdgeAndClean(edge.getTargetNode().getId(), node);
+						}
+					}
+					graph.removeNode(node);
+					stream.onNext(graph.getNodeCount());
+				}
 			}
 		}
 	}
