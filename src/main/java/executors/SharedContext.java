@@ -1,59 +1,60 @@
 package executors;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.swing.JLabel;
 
 import org.graphstream.graph.Graph;
 import org.graphstream.graph.implementations.SingleGraph;
 
+//Class with all shared variables
 public final class SharedContext {
 
 	private static final SharedContext SINGLETON = new SharedContext();
 	private static String BASICURL;
 	
-	private List<String> masterLinks;
 	private int depth; 
 	private boolean start;
 	private String initialUrl;
 	private Graph graph;
 	private Master master;
 	private JLabel totalNodes;
-	private boolean labelNodesIsSetted;
 	private int nNodes;
 	
+
+	/**
+	 * Creates an instance of SharedContext
+	 * 
+	 */
 	public SharedContext() {
 		nNodes = 0;
-		labelNodesIsSetted = false;
-		masterLinks = new ArrayList<>();
+		//masterLinks = new ArrayList<>();
 		start = false;
 		graph = new SingleGraph("grafo");
 	}
 	
-	public boolean nodeExists(String title) {
-		synchronized(graph) {
-			return graph.getNode(title) != null;
-		}
+	//Check if a node already exist
+	public boolean nodeExists(final String title) {
+		return graph.getNode(title) != null;
 	}
 	
-	public boolean edgeExistsTo(String node1, String node2) {
-		synchronized(graph) {
-			return graph.getNode(node1).hasEdgeToward(node2);
-		}
+	//Check if an edge already exist
+	public boolean edgeExistsTo(final String node1, final String node2) {
+		return graph.getNode(node1).hasEdgeToward(node2);
 	}
 	
-	public void addNode(String title) {
+	//Method to create and add a node and increment total nodes
+	public void addNode(final String title) {
 		synchronized (graph) {
 			try {
-				graph.addNode(title);
-				graph.getNode(title).addAttribute("ui.label", graph.getNode(title).getId());
-				setLabelText(++nNodes);
+				if(!nodeExists(title)) {
+					graph.addNode(title).addAttribute("ui.label", graph.getNode(title).getId());
+					setLabelText(++nNodes);
+				}
 			} catch(Exception e) {}
 		}
 	}
 	
-	public void addEdge(String title, String elem1, String elem2) {
+	//Method to create and add an edge
+	public void addEdge(final String title, final String elem1, final String elem2) {
 		synchronized (graph) {
 			try {
 				graph.addEdge(title, elem1, elem2);
@@ -61,52 +62,37 @@ public final class SharedContext {
 		}
 	}
 	
+	//Returns the current graph
 	public Graph getGraph() {
 		return this.graph;
 	}
 	
-	// returns Singleton instance
+	//Returns Singleton instance
 	public static SharedContext getIstance() {
 		return SharedContext.SINGLETON;
 	}
 	
+	//Return the Maximum depth
 	public int getDepth() {
 		return this.depth;
 	}
 	
+	//Set depth at the start of the program
 	public void setDepth(final int depth) {
 		this.depth = depth;
 	}
 	
-	public void setEnd(final boolean val) {
-		this.start = false;
-	}
-	
-	public List<String> getMasterList() {
-		return this.masterLinks;
-	}
-	
-	public boolean setMasterList(final String val) {
-		synchronized (masterLinks) {
-			try {
-				if(!masterLinks.contains(val)) {
-					//System.out.println(val);
-					this.masterLinks.add(val);
-					return true;
-				}
-			} catch(Exception e) {}
-		}
-		return false;
-	}
-	
+	//Get the initial URL
 	public String getInitialUrl() {
 		return this.initialUrl;
 	}
 	
+	//Set initial URL
 	public void setInitialUrl(final String url) {
 		this.initialUrl = url;
 	}
 	
+	//Called when i click on button RUN
 	public void running() {
 		synchronized(this) {
 			try {
@@ -117,39 +103,32 @@ public final class SharedContext {
 		}
 	}
 	
+	//Invoke Master thread to call tasks
 	public void execute() {
 		this.master.execute();
-		//this.master.compute();
 	}
 	
+	//Check if the program is started
 	public boolean isStarted() {
 		return this.start;
 	}
 	
+	//Set the initial part of the URL
 	public void setBasicUrl() {
 		SharedContext.BASICURL = this.initialUrl.toString().substring(0, 25);
 	}
 	
+	//Return the initial part of the UR
 	public String getBasicUrl() {
 		return SharedContext.BASICURL;
 	}
 	
+	//Initialize instance of the label count
 	public void setLabelCount(final JLabel jLabel) {
 		this.totalNodes = jLabel;
 	}
 	
-	public JLabel getLabelCount() {
-		return this.totalNodes;
-	}
-	
-	public boolean getIsLabelCountSetted() {
-		return this.labelNodesIsSetted;
-	}
-	
-	public void setLabelCount() {
-		this.labelNodesIsSetted = true;
-	}
-	
+	//Set text of the label
 	public void setLabelText(final int val) {
 		this.totalNodes.setText("Total Nodes: " + val);
 		

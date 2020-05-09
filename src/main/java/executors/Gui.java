@@ -37,6 +37,7 @@ public class Gui extends JFrame {
 	 * 
 	 * @param w
 	 * @param h
+	 * @param sharedContext
 	 */
 	public Gui(int w, int h, final SharedContext sharedContext) {
 		setTitle("Graph Simulation");
@@ -138,6 +139,7 @@ public class Gui extends JFrame {
 		myFrame.setVisible(true);
 	}
 	
+	//Method to zoom the graph
 	private void zoomGraphMouseWheelMoved(MouseWheelEvent mwe, ViewPanel view_panel){
         if (Event.ALT_MASK != 0) {            
             if (mwe.getWheelRotation() > 0) {
@@ -152,6 +154,7 @@ public class Gui extends JFrame {
         }                     
     }
 	
+	//Method to check if the insert depth is numeric
 	private static boolean isNumeric(String str) { 
 	  try {  
 	    Integer.parseInt(str);  
@@ -161,6 +164,7 @@ public class Gui extends JFrame {
 	  }  
 	}
 	
+	//Method to check if the inserted URL is valid
 	private boolean isURL(String url) {
 	  try {
 	     (new URL(url)).openStream().close();

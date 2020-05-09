@@ -10,6 +10,13 @@ public class GraphRappresentationTask extends RecursiveAction{
 	private String content;
 	private JSONArray links;
 	
+	/**
+	 * Creates a task to draw a part of nodes and edges
+	 * 
+	 * @param sharedContext
+	 * @param links
+	 * @param content
+	 */
 	public GraphRappresentationTask(final SharedContext sharedContext, final JSONArray links, final String content) {
 		this.links = links;
 		this.content = content;
@@ -17,6 +24,7 @@ public class GraphRappresentationTask extends RecursiveAction{
 	}
 	
 	
+	//Called after HTTP request to draw nodes and edges
 	@Override
 	protected void compute() {
 		sharedContext.addNode(content);
@@ -26,7 +34,7 @@ public class GraphRappresentationTask extends RecursiveAction{
 	    		if(!this.sharedContext.nodeExists(str)) {
 	    			this.sharedContext.addNode(str);
 	    		}
-	    		if(!this.sharedContext.edgeExistsTo(content, str) && !this.sharedContext.edgeExistsTo(str, content)) {
+	    		if(!this.sharedContext.edgeExistsTo(content, str) && !sharedContext.edgeExistsTo(str, content)) {
 	    			this.sharedContext.addEdge(content+str, content, str);
 	    		}
 	    	}

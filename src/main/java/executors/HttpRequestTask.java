@@ -21,6 +21,12 @@ public class HttpRequestTask extends RecursiveAction {
 	private String content;
 	private int depth;
 	
+	/**
+	 * Creates a task to do HTTP requests
+	 * 
+	 * @param sharedContext
+	 * @param link
+	 */
 	public HttpRequestTask(final SharedContext sharedContext, final URL link) {
 		this.sharedContext = sharedContext;
 		this.link = link;
@@ -28,12 +34,20 @@ public class HttpRequestTask extends RecursiveAction {
 		this.depth = 0;
 	}
 	
+	/**
+	 * Creates a task to do HTTP requests
+	 * 
+	 * @param sharedContext
+	 * @param content
+	 * @param depth
+	 */
 	public HttpRequestTask(final SharedContext sharedContext, final String content, final int depth) {
 		this.sharedContext = sharedContext;
 		this.content = content;
 		this.depth = depth;
 	}
 
+	//Method called to do HTTP requests and start the sub-tasks to draw the graph
 	@Override
 	protected void compute() {
 		List<RecursiveAction> tasks = new LinkedList<RecursiveAction>();
@@ -68,6 +82,7 @@ public class HttpRequestTask extends RecursiveAction {
 		}
 	}
 	
+	//Method used to parse the URL received
 	private void parseUrl() {
 		try {
 			String parsedUrl = sharedContext.getBasicUrl()+"w/api.php?action=parse&page="+
@@ -81,6 +96,7 @@ public class HttpRequestTask extends RecursiveAction {
 		}
 	}
 	
+	//Method for start the HTTP request
 	private JSONObject getConnectionResponse() {
 		JSONObject jsonObject = new JSONObject();
 		try {
