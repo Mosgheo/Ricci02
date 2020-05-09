@@ -26,9 +26,9 @@ public final class SharedContext {
 	 */
 	public SharedContext() {
 		nNodes = 0;
-		//masterLinks = new ArrayList<>();
 		start = false;
 		graph = new SingleGraph("grafo");
+		graph.setStrict(true);
 	}
 	
 	//Check if a node already exist
@@ -49,7 +49,9 @@ public final class SharedContext {
 					graph.addNode(title).addAttribute("ui.label", graph.getNode(title).getId());
 					setLabelText(++nNodes);
 				}
-			} catch(Exception e) {}
+			} catch(Exception e) {
+				e.printStackTrace();
+			}
 		}
 	}
 	
@@ -58,7 +60,9 @@ public final class SharedContext {
 		synchronized (graph) {
 			try {
 				graph.addEdge(title, elem1, elem2);
-			} catch (Exception e) {}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		}
 	}
 	
