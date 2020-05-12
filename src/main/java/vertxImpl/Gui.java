@@ -1,10 +1,8 @@
 package vertxImpl;
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Event;
-import java.awt.EventQueue;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -13,19 +11,16 @@ import java.awt.event.MouseWheelListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.net.URL;
-
 import javax.swing.*;
-
 import org.graphstream.graph.Graph;
-import org.graphstream.ui.geom.Point2;
-import org.graphstream.ui.geom.Point3;
 import org.graphstream.ui.swingViewer.ViewPanel;
-import org.graphstream.ui.view.Camera;
 import org.graphstream.ui.view.View;
 import org.graphstream.ui.view.Viewer;
 
+import io.vertx.core.Vertx;
 import io.vertx.core.eventbus.EventBus;
 
+@SuppressWarnings("deprecation")
 public class Gui extends JFrame {
 
 	private static final long serialVersionUID = 1L;
@@ -50,7 +45,7 @@ public class Gui extends JFrame {
 	 * @param w
 	 * @param h
 	 */
-	public Gui(int w, int h, final EventBus eb, Graph g) {
+	public Gui(int w, int h, Graph g,EventBus eb) {
 
 		setTitle("Graph Simulation");
 		setSize(w, h);

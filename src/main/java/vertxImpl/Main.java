@@ -7,10 +7,9 @@ public class Main {
 
 	public static void main(String[] args) {
 		Vertx vertx = Vertx.vertx();
-	    int istances = Runtime.getRuntime().availableProcessors()+2;
+	    int istances = Runtime.getRuntime().availableProcessors()+10;
 		DeploymentOptions options = new DeploymentOptions().setWorker(true);
 	    vertx.eventBus().registerDefaultCodec(DataHolder.class, new DataCodec());
 		vertx.deployVerticle(new GuiVerticle(istances),options);
 	}
-
 }
