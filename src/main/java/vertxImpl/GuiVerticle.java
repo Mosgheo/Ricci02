@@ -38,7 +38,6 @@ public class GuiVerticle extends AbstractVerticle {
 		graph = new SingleGraph("grafo");
 		view = new Gui(1024, 768, graph,eb);
 		view.display();
-		
 		/**
 		 * When a GUI worker verticle is deployed, it launches the view and
 		 * the first verticle.
@@ -51,7 +50,6 @@ public class GuiVerticle extends AbstractVerticle {
 				initialMillis = System.currentTimeMillis();
 				vertx.deployVerticle(new MyVerticle(instancies,DEPT, maxDept, words));
 		});
-		
 		/**
 		 * Every time a word is found and a node has to be added, it's sent through a
 		 * "updateView" message.
@@ -70,6 +68,7 @@ public class GuiVerticle extends AbstractVerticle {
 		 * vertx shuts them down.
 		 */
 		eb.consumer("stop", message -> {
+			//System.out.println(vertx.deploymentIDs().size());
 			//System.out.println("RECEIVED  STOP NUMBER "+nodesCount+" ; WAITING FOR OTHERS");
 			finalMillis = System.currentTimeMillis();
 			long diff = finalMillis - initialMillis;
@@ -77,8 +76,9 @@ public class GuiVerticle extends AbstractVerticle {
 			if (nodesCount == Math.pow(instancies, maxDept-1)) {
 				System.out.println("EVERYONE STOPPED, TIME:" + diff);
 				view.updateLabel();
+				vertx.close();
 				//Closes the program and undeploys every verticle instanciated.
-				vertx.deployVerticle(new UpdateVerticle(graph,nodes.get(0)),new DeploymentOptions().setWorker(true));
+				//vertx.deployVerticle(new UpdateVerticle(graph,nodes.get(0)),new DeploymentOptions().setWorker(true));
 			}
 
 		});
