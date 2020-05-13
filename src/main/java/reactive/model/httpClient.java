@@ -85,8 +85,9 @@ public class httpClient {
 			this.parseUrl();
 			HttpURLConnection connection = (HttpURLConnection)link.openConnection();
 			connection.setRequestMethod("GET");
-			connection.connect(); 
-
+			connection.setRequestProperty("connection","keep-alive");
+			connection.connect();
+			
 			if(connection.getResponseCode() == 200) {
 				BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
 				String inputLine;
@@ -96,13 +97,19 @@ public class httpClient {
 			    }
 			    reader.close();
 			    jsonObject = new JSONObject(response.toString());
+			} else {
+				//connection.disconnect();
+				//System.out.println(""+connection.getResponseCode());
+				return getConnectionResponse(link);
 			}
 		} catch (Exception e) {
-			System.out.println("TIMEOUT");
-			return null;
+			try {
+				return getConnectionResponse(link);
+			} catch(Exception c) {
+				e.printStackTrace();
+			}
 		}
 		return jsonObject;
-		
 	}
 	
 	public List<String> getResult(){

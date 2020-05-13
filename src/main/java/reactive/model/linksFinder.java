@@ -10,7 +10,9 @@ import java.util.concurrent.TimeUnit;
 
 import org.graphstream.graph.Edge;
 
+import io.reactivex.rxjava3.annotations.NonNull;
 import io.reactivex.rxjava3.core.*;
+import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 import reactive.control.SharedContext;
 
@@ -19,7 +21,7 @@ public class linksFinder {
 	private final SharedContext context;
 	private final String base;
 	private final int depth;
-	int TODOREMOVE = 0;
+
 	public linksFinder(final SharedContext context, String base, int depth) {
 		this.context = context;
 		this.base = base;
@@ -115,8 +117,7 @@ public class linksFinder {
 
 	//OPTIONAL PART, KEEP CHECKING FOREVER FOR UPDATES ON THIS NODE
 	private void checkNodeForUpdates(Voice node) {		
-		if(node.getDepth() < depth) {
-			
+		if(node.getDepth() < depth) {			
 			final URL converted;
 			
 			try {
@@ -127,12 +128,16 @@ public class linksFinder {
 				return;
 			}
 
-			httpClient client = new httpClient(converted, context);
-			
-			Observable
-			.interval(6, TimeUnit.SECONDS)
+			Flowable
+			.interval(15, TimeUnit.SECONDS)
 			.subscribeOn(Schedulers.computation())
 			.subscribe((s) -> {
+				if(!context.nodeExists(node.getTitle())) {
+					return;
+				}
+				
+				httpClient client = new httpClient(converted, context);
+				
 				if(client.connect() && client.getResult() != null) {
 
 					ArrayList<String> children = context.getChildren(node.getTitle());
