@@ -28,7 +28,7 @@ public class GraphRappresentationTask extends RecursiveAction{
 	@Override
 	protected void compute() {
 		if(!this.sharedContext.nodeExists(content)) {
-			sharedContext.addNode(content);
+			this.sharedContext.addNode(content);
 		}
 	    for(int i = 0; i < links.length(); i++) {
 	    	if(links.getJSONObject(i).getInt("ns") == 0) {

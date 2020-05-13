@@ -39,7 +39,7 @@ public class Gui extends JFrame {
 	 * @param h
 	 * @param sharedContext
 	 */
-	public Gui(int w, int h, final SharedContext sharedContext) {
+	public Gui(final int w, final int h, final SharedContext sharedContext) {
 		setTitle("Graph Simulation");
 		setSize(w, h);
 		JFrame myFrame = new JFrame();

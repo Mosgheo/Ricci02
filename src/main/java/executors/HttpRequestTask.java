@@ -14,6 +14,8 @@ import java.util.concurrent.RecursiveAction;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import io.vertx.core.http.HttpConnection;
+
 public class HttpRequestTask extends RecursiveAction {
 	
 	private SharedContext sharedContext;
@@ -104,9 +106,10 @@ public class HttpRequestTask extends RecursiveAction {
 			this.parseUrl();
 			HttpURLConnection connection = (HttpURLConnection)link.openConnection();
 			connection.setRequestMethod("GET");
+			connection.setRequestProperty("connection","keep-alive");
 			connection.connect();
 			
-			if(connection.getResponseCode() != 429) {
+			if(connection.getResponseCode() == 200) {
 				BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
 				String inputLine;
 			    StringBuffer response = new StringBuffer();
@@ -116,10 +119,16 @@ public class HttpRequestTask extends RecursiveAction {
 			    reader.close();
 			    jsonObject = new JSONObject(response.toString());
 			} else {
-				return null;
+				//connection.disconnect();
+				//System.out.println(""+connection.getResponseCode());
+				return getConnectionResponse();
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			try {
+				return getConnectionResponse();
+			} catch(Exception c) {
+				e.printStackTrace();
+			}
 		}
 		return jsonObject;
 	}

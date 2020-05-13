@@ -18,7 +18,6 @@ public final class SharedContext {
 	private Master master;
 	private JLabel totalNodes;
 	private int nNodes;
-	
 
 	/**
 	 * Creates an instance of SharedContext
@@ -137,7 +136,6 @@ public final class SharedContext {
 	//Set text of the label
 	public void setLabelText(final int val) {
 		this.totalNodes.setText("Total Nodes: " + val);
-		
 	}
 	
 	public static void log(String msg) {
