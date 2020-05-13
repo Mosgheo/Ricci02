@@ -57,12 +57,17 @@ public class HttpRequestTask extends RecursiveAction {
 			}
 			
 			JSONObject jsonObject = this.getConnectionResponse();
-			//For bad request 400
+			//For error 429 or not existing page
 		    if(jsonObject==null || !jsonObject.has("parse")) {
 		    	return;
 		    }
 		    
 		    JSONArray jsonArray = jsonObject.getJSONObject("parse").getJSONArray("links");
+		    
+		    GraphRappresentationTask graphTask = new GraphRappresentationTask(sharedContext, jsonArray, content);
+		    tasks.add(graphTask);
+		    graphTask.fork();
+		    
 		    for(int i = 0; i < jsonArray.length(); i++) {
 		    	if(jsonArray.getJSONObject(i).getInt("ns") == 0) {
 		    		String str = jsonArray.getJSONObject(i).getString("*");
@@ -71,10 +76,6 @@ public class HttpRequestTask extends RecursiveAction {
 		    		httpTask.fork();
 		    	}
 		    }
-		    
-		    GraphRappresentationTask graphTask = new GraphRappresentationTask(sharedContext, jsonArray, content);
-		    tasks.add(graphTask);
-		    graphTask.fork();
 		    
 		    for(RecursiveAction task : tasks) {
 		    	task.join();

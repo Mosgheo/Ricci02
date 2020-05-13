@@ -59,7 +59,9 @@ public final class SharedContext {
 	public void addEdge(final String title, final String elem1, final String elem2) {
 		synchronized (graph) {
 			try {
-				graph.addEdge(title, elem1, elem2);
+				if(!edgeExistsTo(elem1, elem2) && !edgeExistsTo(elem2, elem1)) {
+					graph.addEdge(title, elem1, elem2);
+	    		}
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

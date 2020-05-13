@@ -27,14 +27,16 @@ public class GraphRappresentationTask extends RecursiveAction{
 	//Called after HTTP request to draw nodes and edges
 	@Override
 	protected void compute() {
-		sharedContext.addNode(content);
+		if(!this.sharedContext.nodeExists(content)) {
+			sharedContext.addNode(content);
+		}
 	    for(int i = 0; i < links.length(); i++) {
 	    	if(links.getJSONObject(i).getInt("ns") == 0) {
 	    		String str = links.getJSONObject(i).getString("*");
 	    		if(!this.sharedContext.nodeExists(str)) {
 	    			this.sharedContext.addNode(str);
 	    		}
-	    		if(!this.sharedContext.edgeExistsTo(content, str) && !sharedContext.edgeExistsTo(str, content)) {
+	    		if(!this.sharedContext.edgeExistsTo(content, str) && !this.sharedContext.edgeExistsTo(str, content)) {
 	    			this.sharedContext.addEdge(content+str, content, str);
 	    		}
 	    	}
