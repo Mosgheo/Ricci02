@@ -4,7 +4,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import io.vertx.core.AbstractVerticle;
-import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Future;
 import io.vertx.core.eventbus.EventBus;
 
@@ -22,7 +21,6 @@ public class GuiVerticle extends AbstractVerticle {
 	private int instancies;
 	private int maxDept;
 	private List<NodeTuple> nodes;
-	
 	public GuiVerticle(final int instancies) {
 		this.instancies = instancies;
 	}
@@ -59,8 +57,9 @@ public class GuiVerticle extends AbstractVerticle {
 			NodeTuple newWords = c.getData();
 			nodes.add(newWords);
 			updateView(newWords);
-			//view.updateLabel();
+			view.updateLabel();
 		});
+		
 		
 		/**
 		 * When a verticle ends its computation because the targeted depth is reached,
@@ -68,17 +67,14 @@ public class GuiVerticle extends AbstractVerticle {
 		 * vertx shuts them down.
 		 */
 		eb.consumer("stop", message -> {
-			//System.out.println(vertx.deploymentIDs().size());
-			//System.out.println("RECEIVED  STOP NUMBER "+nodesCount+" ; WAITING FOR OTHERS");
 			finalMillis = System.currentTimeMillis();
 			long diff = finalMillis - initialMillis;
 			nodesCount++;
-			if (nodesCount == Math.pow(instancies, maxDept-1)) {
+			if (nodesCount >= Math.pow(instancies, maxDept-1) ) {
 				System.out.println("EVERYONE STOPPED, TIME:" + diff);
 				view.updateLabel();
-				vertx.close();
 				//Closes the program and undeploys every verticle instanciated.
-				//vertx.deployVerticle(new UpdateVerticle(graph,nodes.get(0)),new DeploymentOptions().setWorker(true));
+				vertx.close();
 			}
 
 		});
@@ -101,7 +97,6 @@ public class GuiVerticle extends AbstractVerticle {
 				if (!nodeExists(value)) {
 					graph.addNode(value);
 					graph.getNode(value).addAttribute("ui.label", graph.getNode(value).getId());
-					// System.out.println("NNOODDII: "+graph.getNodeCount());
 					graph.addEdge(father + value, father, value);
 				} else {
 					/*

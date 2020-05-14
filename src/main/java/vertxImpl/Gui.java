@@ -17,7 +17,6 @@ import org.graphstream.ui.swingViewer.ViewPanel;
 import org.graphstream.ui.view.View;
 import org.graphstream.ui.view.Viewer;
 
-import io.vertx.core.Vertx;
 import io.vertx.core.eventbus.EventBus;
 
 @SuppressWarnings("deprecation")
@@ -162,9 +161,6 @@ public class Gui extends JFrame {
 	}
 	private static String getContent(final String link) {
 		String content = link.substring(30);
-		//System.out.println(basicUrl+"w/api.php?action=parse&page=" + content + "&format=json&section=0&prop=links");
-		// System.out.println(basicUrl);
-		//System.out.println(content);
 		return content;
 	}
 	
