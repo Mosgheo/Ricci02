@@ -3,8 +3,6 @@ package reactive.model;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
-import java.net.BindException;
-import java.net.ConnectException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -32,8 +30,13 @@ public class httpClient {
 		this.isConnected = false;
 	}
 	
-	public boolean connect() {	
-		
+	
+	/**
+	 * Tries to connect with the Wikipedia API
+	 * 
+	 * @return a boolean indicating if the connection has been successful
+	 */
+	public boolean connect() {		
 		try {
 			URL parsedUrl = parseUrl();
 			
@@ -60,8 +63,12 @@ public class httpClient {
 		return isConnected;
 	}
 	
+	/**
+	 * Parses the URL in order to make it compatible with the Wikipedia API
+	 *  
+	 * @return the parsed URL
+	 */
 	private URL parseUrl() {
-		
 		String basicUrl = context.getBasicUrl();
 		String content = url.toString().substring(30);
 		URL myURL = null;
@@ -79,9 +86,15 @@ public class httpClient {
 		return myURL;		
 	}
 	
+	/**
+	 * Instaurates the connection and parses the result as a JSON, the TIMEOUT problem is handled by retrying the connection
+	 *  
+	 * @return the result as a JSON
+	 */
 	private JSONObject getConnectionResponse(URL link) {
 		JSONObject jsonObject = new JSONObject();
 		try {
+			
 			this.parseUrl();
 			HttpURLConnection connection = (HttpURLConnection)link.openConnection();
 			connection.setRequestMethod("GET");
@@ -92,22 +105,26 @@ public class httpClient {
 				BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
 				String inputLine;
 			    StringBuffer response = new StringBuffer();
+			    
 			    while ((inputLine = reader.readLine()) != null) {
 			    	response.append(inputLine);
 			    }
+			    
 			    reader.close();
 			    jsonObject = new JSONObject(response.toString());
+			    
 			} else {
-				//connection.disconnect();
-				//System.out.println(""+connection.getResponseCode());
 				return getConnectionResponse(link);
 			}
+			
 		} catch (Exception e) {
+			
 			try {
 				return getConnectionResponse(link);
 			} catch(Exception c) {
 				e.printStackTrace();
 			}
+			
 		}
 		return jsonObject;
 	}

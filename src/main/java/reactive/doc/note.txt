@@ -1,9 +1,0 @@
-creo un thread cold come in test03b , ognuno di essi conterrà un valore di i per la profondità. Ogni thread controlla tutti i link e crea altri thread per ognuno di essi.
-per ogni voce una subscribe
-
-PublishSubject se voglio approccio hot
-
-In merito all'assignment 2 notato una cosa, utilizzando il metodo https://it.wikipedia.org/w/api.php?action=parse&page=COVID-19&format=json&section=0&prop=links per ottenere il json con i vari link della section alcuni di essi vengono restituiti non normalizzati per le api di wiki, ad esempio verrà restituito UTC+8 invece che UTC%2B8
-Usando lo stesso metodo per cercare la pagina parsata di UTC+8 non avrò risultati dato che il title corretto è UTC%2B8
-
-abbiamo deciso di non gestire il problema in quanto ritenuto non rilevante ai fini dell'assignement

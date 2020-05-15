@@ -8,11 +8,8 @@ import java.util.List;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
-import org.graphstream.graph.Edge;
 
-import io.reactivex.rxjava3.annotations.NonNull;
 import io.reactivex.rxjava3.core.*;
-import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 import reactive.control.SharedContext;
 
@@ -28,6 +25,10 @@ public class linksFinder {
 		this.depth = depth;
 	}
 	
+	/**
+	 * Start the research for the first node
+	 *  
+	 */
 	public void start() {
 		//create the first observable which will generate a random color for all the first sons
 		Observable<Voice> source = Observable.create(emitter -> {	     
@@ -45,21 +46,26 @@ public class linksFinder {
 					for (String title : titles) {
 						emitter.onNext(new Voice(1, title, baseTitle, generateColor()));
 					}
-//					checkNodeForUpdates(new Voice(0,baseTitle,null,"rgb(0,0,0);"));
+					checkNodeForUpdates(new Voice(0,baseTitle,null,"rgb(0,0,0);"));
 				}
 			}	
 		 });
 		
 		log("subscribing.");
 
-		//generate a new Observable for each voice found util we reach desired depth
+		//generate a new Observable for each voice found until we reach desired depth
 		source
 		.subscribeOn(Schedulers.io())
 		.subscribe((s) -> {
 			handleNode(s);
 		}, Throwable::printStackTrace);
 	}
-
+	
+	/**
+	 * As a node is found decide if add the new node to the graph, an edge only or just check for updates on it
+	 *  
+	 * @param node: the received node
+	 */
 	private synchronized void handleNode(Voice node) {
 		//if the node exists add node and edge else add only edge
 		if(!context.nodeExists(node.getTitle())) {	
@@ -78,6 +84,11 @@ public class linksFinder {
 		checkNodeForUpdates(node);
 	}	
 	
+	/**
+	 * Recursively look for connected nodes
+	 *   
+	 * @param node: the received node
+	 */
 	private void createAndSubscribe(Voice node)
 	{
 		//if reached desired depth don't go further down
@@ -132,6 +143,7 @@ public class linksFinder {
 			.interval(15, TimeUnit.SECONDS)
 			.subscribeOn(Schedulers.computation())
 			.subscribe((s) -> {
+				//in case the node has been removed
 				if(!context.nodeExists(node.getTitle())) {
 					return;
 				}
